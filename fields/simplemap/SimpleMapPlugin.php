@@ -1,11 +1,11 @@
 <?php
 namespace Craft;
 
-class SmartMapPlugin extends BasePlugin
+class SimpleMapPlugin extends BasePlugin
 {
 	public function init()
 	{
-		Craft::import('plugins.smartmap.integrations.feedme.fields.SmartMap_AddressFeedMeFieldType');
+		Craft::import('plugins.simplemap.integrations.feedme.fields.SimpleMap_MapFeedMeFieldType');
 	}
 
 	// =========================================================================== //
@@ -14,7 +14,7 @@ class SmartMapPlugin extends BasePlugin
 	public function registerFeedMeFieldTypes()
 	{
 		return array(
-			new SmartMap_AddressFeedMeFieldType(),
+			new SimpleMap_MapFeedMeFieldType(),
 		);
 	}
 }
