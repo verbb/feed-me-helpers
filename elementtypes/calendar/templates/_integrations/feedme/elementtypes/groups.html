@@ -1,0 +1,11 @@
+{% set calendars = craft.feedMe.getElementTypeGroups(elementType) %}
+
+{{ forms.selectField({
+    label: "Calendar" | t,
+    instructions: 'Choose the calendar you want to save your feed data into.' | t,
+    id: 'elementGroup-' ~ elementType,
+    name: 'elementGroup[' ~ elementType ~ ']',
+    options: craft.feedme.getSelectOptions(calendars),
+    value: feed.elementGroup[elementType] ?? '',
+    required: true,
+}) }}

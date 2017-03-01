@@ -1,0 +1,192 @@
+{% if feed.elementGroup %}
+    {% set calendarId = feed.elementGroup[elementType] %}
+
+    {% set calendar = craft.calendar.calendar({ id: calendarId }) %}
+{% endif %}
+
+{% set users = [{ label: 'Don\'t import', value: '' }] %}
+{% if CraftEdition >= CraftClient %}
+    {% for user in craft.users.can('createEvents:' ~ calendarId) %}
+        {% set users = users | merge([{ label: user, value: user.id }]) %}
+    {% endfor %}
+{% endif %}
+
+{% set fields = [{
+    label: 'Title' | t,
+    handle: 'title',
+    default: forms.textField({
+        id: 'fieldDefaults-title',
+        name: 'fieldDefaults[title]',
+        value: feed.fieldDefaults.title ?? '',
+    }),
+}, {
+    label: 'Slug' | t,
+    handle: 'slug',
+    instructions: 'If not set, the Slug will be automatically created from Title.' | t,
+}, {
+    label: 'Start Date' | t,
+    handle: 'startDate',
+    instructions: 'Accepts Unix timestamp, or just about any English textual datetime description.' | t,
+    default: forms.dateTimeField({
+        id: 'fieldDefaults-startDate',
+        name: 'fieldDefaults[startDate]',
+        value: feed.fieldDefaults.startDate is defined ? craft.feedme.formatDateTime(feed.fieldDefaults.startDate) : '',
+    }),
+}, {
+    label: 'End Date' | t,
+    handle: 'endDate',
+    instructions: 'Accepts Unix timestamp, or just about any English textual datetime description.' | t,
+    default: forms.dateTimeField({
+        id: 'fieldDefaults-endDate',
+        name: 'fieldDefaults[endDate]',
+        value: feed.fieldDefaults.endDate is defined ? craft.feedme.formatDateTime(feed.fieldDefaults.endDate) : '',
+    }),
+}, {
+    label: 'All Day' | t,
+    handle: 'allDay',
+    instructions: 'Whether this event is all day or not.' | t,
+    default: forms.selectField({
+        id: 'fieldDefaults-allDay',
+        name: 'fieldDefaults[allDay]',
+        value: feed.fieldDefaults.allDay is defined ? feed.fieldDefaults.allDay : '',
+        options: [
+            { label: 'Don\'t import', value: '' },
+            { label: 'Yes', value: '1' },
+            { label: 'No', value: '0' },
+        ],
+    }),
+}, {
+    label: 'Enabled' | t,
+    handle: 'enabled',
+    instructions: 'Choose either a default status from the list or the imported field that will contain the status.' | t,
+    default: forms.selectField({
+        id: 'fieldDefaults-enabled',
+        name: 'fieldDefaults[enabled]',
+        value: feed.fieldDefaults.enabled is defined ? feed.fieldDefaults.enabled : '',
+        options: [
+            { label: 'Don\'t import', value: '' },
+            { label: 'Enabled', value: '1' },
+            { label: 'Disabled', value: '0' },
+        ],
+    }),
+}, {
+    label: 'Author' | t,
+    handle: 'authorId',
+    instructions: 'Entries will be assigned to the user in this field. If the field does not match any existing member, the default author will be assigned.' | t,
+    default: forms.selectField({
+        id: 'fieldDefaults-authorId',
+        name: 'fieldDefaults[authorId]',
+        value: feed.fieldDefaults.authorId ?? '',
+        options: users,
+    }),
+}, {
+    label: 'Event ID' | t,
+    handle: 'id',
+    instructions: '<strong class="error">Warning: </strong>This should only be used for an existing Solspace Event ID.' | t,
+}] %}
+
+<h2>{{ 'Event Fields' | t }}</h2>
+
+<table class="feedme-mapping data fullwidth collapsible">
+    <thead>
+        <th>{{ 'Field' | t }}</th>
+        <th>{{ 'Feed Element' | t }}</th>
+        <th>{{ 'Default Value' | t }}</th>
+    </thead>
+    <tbody>
+        {% for field in fields if field %}
+            {{ feedMeMacro.generateRow(_context, field) }}
+        {% endfor %}
+    </tbody>
+</table>
+
+{% set recurrenceFields = [{
+    label: 'Repeats' | t,
+    handle: 'repeats',
+    instructions: 'Whether this event repeats.' | t,
+    default: forms.selectField({
+        id: 'fieldDefaults-repeats',
+        name: 'fieldDefaults[repeats]',
+        value: feed.fieldDefaults.repeats is defined ? feed.fieldDefaults.repeats : '',
+        options: [
+            { label: 'Don\'t import', value: '' },
+            { label: 'Yes', value: '1' },
+            { label: 'No', value: '0' },
+        ],
+    }),
+}, {
+    label: 'Repeat Interval' | t,
+    handle: 'interval',
+}, {
+    label: 'Repeat Frequency' | t,
+    handle: 'frequency',
+}, {
+    label: 'Repeats By' | t,
+    handle: 'repeatsBy',
+}, {
+    label: 'Until Type' | t,
+    handle: 'untilType',    
+}] %}
+
+<h2>{{ 'Recurrence Fields' | t }}</h2>
+
+<table class="feedme-mapping data fullwidth collapsible">
+    <thead>
+        <th>{{ 'Field' | t }}</th>
+        <th>{{ 'Feed Element' | t }}</th>
+        <th>{{ 'Default Value' | t }}</th>
+    </thead>
+    <tbody>
+        {% for field in recurrenceFields if field %}
+            {{ feedMeMacro.generateRow(_context, field) }}
+        {% endfor %}
+    </tbody>
+</table>
+
+{% for tab in craft.fields.getLayoutById(calendar.fieldLayoutId).getTabs() %}
+    <hr>
+
+    <h2>{{ tab.name }} Fields</h2>
+
+    <table class="feedme-mapping data fullwidth collapsible">
+        <thead>
+            <th>{{ 'Field' | t }}</th>
+            <th>{{ 'Feed Element' | t }}</th>
+            <th>{{ 'Default Value' | t }}</th>
+        </thead>
+        <tbody>
+            {% for fieldtype in tab.getFields() %}
+                {% set field = fieldtype.getField() %}
+
+                {% set variables = { field: field, fieldtype: fieldtype, feed: feed, feedData: feedData } %}
+                {% include 'feedme/_includes/field' with variables %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endfor %}
+
+<hr>
+
+<h2>{{ "Set a unique identifier for existing elements" | t }}</h2>
+
+<p>{{ "Select the fields you want to use to check for existing elements. When selected, Feed Me will look for existing elements that match the fields provided below and either update, or skip depending on your choice of Import Strategy." | t }}</p>
+
+{% set fields = fields | merge(recurrenceFields) %}
+
+{% for tab in craft.fields.getLayoutById(calendar.fieldLayoutId).getTabs() %}
+    {% for fieldtype in tab.getFields() %}
+        {% set field = fieldtype.getField() %}
+
+        {% set fields = fields | merge([{ label: field.name, handle: field.handle }]) %}
+    {% endfor %}
+{% endfor %}
+
+<div class="feedme-uniques">
+    {% for field in fields if field %}
+        {{ forms.checkboxField({
+            name: 'fieldUnique[' ~ field.handle ~ ']',
+            label: field.label,
+            checked: feed.fieldUnique[field.handle] ?? '',
+        }) }}
+    {% endfor %}
+</div>
