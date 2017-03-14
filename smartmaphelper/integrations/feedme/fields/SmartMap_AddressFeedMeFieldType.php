@@ -8,7 +8,7 @@ class SmartMap_AddressFeedMeFieldType extends BaseFeedMeFieldType
 
     public function getMappingTemplate()
     {
-        return 'smartmap/_integrations/feedme/fields/smartmap_address';
+        return 'smartmaphelper/_integrations/feedme/fields/smartmap_address';
     }
     
 

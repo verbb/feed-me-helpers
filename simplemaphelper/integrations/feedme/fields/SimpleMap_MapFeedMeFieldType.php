@@ -8,7 +8,7 @@ class SimpleMap_MapFeedMeFieldType extends BaseFeedMeFieldType
 
     public function getMappingTemplate()
     {
-        return 'simplemap/_integrations/feedme/fields/simplemap_map';
+        return 'simplemaphelper/_integrations/feedme/fields/simplemap_map';
     }
     
 

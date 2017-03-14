@@ -10,17 +10,17 @@ class Calendar_EventFeedMeElementType extends BaseFeedMeElementType
 
     public function getGroupsTemplate()
     {
-        return 'calendar/_integrations/feedme/elementtypes/groups';
+        return 'calendarhelper/_integrations/feedme/elementtypes/groups';
     }
 
     public function getColumnTemplate()
     {
-        return 'calendar/_integrations/feedme/elementtypes/column';
+        return 'calendarhelper/_integrations/feedme/elementtypes/column';
     }
 
     public function getMappingTemplate()
     {
-        return 'calendar/_integrations/feedme/elementtypes/map';
+        return 'calendarhelper/_integrations/feedme/elementtypes/map';
     }
 
 
