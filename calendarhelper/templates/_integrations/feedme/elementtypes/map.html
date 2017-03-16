@@ -14,6 +14,7 @@
 {% set fields = [{
     label: 'Title' | t,
     handle: 'title',
+    required: true,
     default: forms.textField({
         id: 'fieldDefaults-title',
         name: 'fieldDefaults[title]',
@@ -26,6 +27,7 @@
 }, {
     label: 'Start Date' | t,
     handle: 'startDate',
+    required: true,
     instructions: 'Accepts Unix timestamp, or just about any English textual datetime description.' | t,
     default: forms.dateTimeField({
         id: 'fieldDefaults-startDate',
@@ -35,6 +37,7 @@
 }, {
     label: 'End Date' | t,
     handle: 'endDate',
+    required: true,
     instructions: 'Accepts Unix timestamp, or just about any English textual datetime description.' | t,
     default: forms.dateTimeField({
         id: 'fieldDefaults-endDate',
@@ -101,31 +104,32 @@
 </table>
 
 {% set recurrenceFields = [{
-    label: 'Repeats' | t,
-    handle: 'repeats',
-    instructions: 'Whether this event repeats.' | t,
-    default: forms.selectField({
-        id: 'fieldDefaults-repeats',
-        name: 'fieldDefaults[repeats]',
-        value: feed.fieldDefaults.repeats is defined ? feed.fieldDefaults.repeats : '',
-        options: [
-            { label: 'Don\'t import', value: '' },
-            { label: 'Yes', value: '1' },
-            { label: 'No', value: '0' },
-        ],
-    }),
+    label: 'Repeat Rule' | t,
+    handle: 'rrule',
 }, {
     label: 'Repeat Interval' | t,
     handle: 'interval',
 }, {
     label: 'Repeat Frequency' | t,
-    handle: 'frequency',
+    handle: 'freq',
 }, {
-    label: 'Repeats By' | t,
-    handle: 'repeatsBy',
+    label: 'Repeat Count' | t,
+    handle: 'count',
 }, {
-    label: 'Until Type' | t,
-    handle: 'untilType',    
+    label: 'Until' | t,
+    handle: 'until',    
+}, {
+    label: 'By Month' | t,
+    handle: 'byMonth',    
+}, {
+    label: 'By Year Day' | t,
+    handle: 'byYearDay',    
+}, {
+    label: 'By Month Day' | t,
+    handle: 'byMonthDay',    
+}, {
+    label: 'By Day' | t,
+    handle: 'byDay',    
 }] %}
 
 <h2>{{ 'Recurrence Fields' | t }}</h2>
