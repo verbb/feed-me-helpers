@@ -191,6 +191,8 @@ class Calendar_EventFeedMeElementType extends BaseFeedMeElementType
             $date_string = date('Y-m-d H:i:s', mktime($d['hour'], $d['minute'], $d['second'], $d['month'], $d['day'], $d['year']));
 
             $craftDate = DateTime::createFromString($date_string, craft()->timezone);
+        } else {
+            $craftDate = $date;
         }
 
         return $craftDate;
