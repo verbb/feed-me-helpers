@@ -94,23 +94,29 @@ class Calendar_EventFeedMeElementType extends BaseFeedMeElementType
                 continue;
             }
 
+            if (is_array($value)) {
+                $dataValue = Hash::get($value, 'data', $value);
+            } else {
+                $dataValue = $value;
+            }
+
             switch ($handle) {
                 case 'id';
                 case 'interval';
                 case 'frequency';
                 case 'repeatsBy';
                 case 'untilType';
-                    $element->$handle = $value['data'];
+                    $element->$handle = $dataValue;
                     break;
                 case 'authorId';
-                    $element->$handle = $this->_prepareAuthorForElement($value['data']);
+                    $element->$handle = $this->_prepareAuthorForElement($dataValue);
                     break;
                 case 'slug';
-                    $element->$handle = ElementHelper::createSlug($value['data']);
+                    $element->$handle = ElementHelper::createSlug($dataValue);
                     break;
                 case 'startDate':
                 case 'endDate';
-                    $dateValue = $this->_prepareDateForElement($value['data']);
+                    $dateValue = $this->_prepareDateForElement($dataValue);
 
                     // Ensure there's a parsed data - null will auto-generate a new date
                     if ($dateValue) {
@@ -121,10 +127,10 @@ class Calendar_EventFeedMeElementType extends BaseFeedMeElementType
                 case 'enabled':
                 case 'allDay':
                 case 'repeats':
-                    $element->$handle = (bool)$value['data'];
+                    $element->$handle = (bool)$dataValue;
                     break;
                 case 'title':
-                    $element->getContent()->$handle = $value['data'];
+                    $element->getContent()->$handle = $dataValue;
                     break;
                 default:
                     continue 2;
