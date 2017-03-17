@@ -150,7 +150,7 @@ class Calendar_EventFeedMeElementType extends BaseFeedMeElementType
     {
         // Are we targeting a specific locale here? If so, we create an essentially blank element
         // for the primary locale, and instead create a locale for the targeted locale
-        if (isset($settings['locale'])) {
+        if (isset($settings['locale']) && $settings['locale']) {
             // Save the default locale element empty
             if (craft()->calendar_events->saveEvent($element)) {
                 // Now get the successfully saved (empty) element, and set content on that instead
@@ -158,7 +158,15 @@ class Calendar_EventFeedMeElementType extends BaseFeedMeElementType
                 $elementLocale->setContentFromPost($data);
 
                 // Save the locale entry
-                return craft()->calendar_events->saveEvent($elementLocale);
+                if (craft()->calendar_events->saveEvent($elementLocale)) {
+                    return true;
+                } else {
+                    if ($elementLocale->getErrors()) {
+                        throw new Exception(json_encode($elementLocale->getErrors()));
+                    } else {
+                        throw new Exception(Craft::t('Unknown Element error occurred.'));
+                    }
+                }
             } else {
                 if ($element->getErrors()) {
                     throw new Exception(json_encode($element->getErrors()));
