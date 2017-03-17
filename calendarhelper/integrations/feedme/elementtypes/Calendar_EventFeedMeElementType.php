@@ -148,6 +148,9 @@ class Calendar_EventFeedMeElementType extends BaseFeedMeElementType
 
     public function save(BaseElementModel &$element, array $data, $settings)
     {
+        // Put this back for now, until we can figure out a better solution with required fields
+        $element->setContentFromPost($data);
+
         // Are we targeting a specific locale here? If so, we create an essentially blank element
         // for the primary locale, and instead create a locale for the targeted locale
         if (isset($settings['locale']) && $settings['locale']) {
