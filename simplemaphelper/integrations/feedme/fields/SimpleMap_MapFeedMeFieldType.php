@@ -36,7 +36,7 @@ class SimpleMap_MapFeedMeFieldType extends BaseFeedMeFieldType
         // Check for empty Address
         if (!isset($content['address'])) {
             if (isset($content['lat']) || isset($content['lng'])) {
-                $addressInfo = $this->_getAddressFromLatLng($content['lat'], $content['lng']);
+                $addressInfo = $this->getAddressFromLatLng($content['lat'], $content['lng']);
                 $content['address'] = $addressInfo['formatted_address'];
 
                 // Populate address parts
@@ -52,7 +52,7 @@ class SimpleMap_MapFeedMeFieldType extends BaseFeedMeFieldType
         // Check for empty Longitude/Latitude
         if (!isset($content['lat']) || !isset($content['lng'])) {
             if (isset($content['address'])) {
-                $latlng = $this->_getLatLngFromAddress($content['address']);
+                $latlng = $this->getLatLngFromAddress($content['address']);
                 $content['lat'] = $latlng['lat'];
                 $content['lng'] = $latlng['lng'];
             }
@@ -62,13 +62,7 @@ class SimpleMap_MapFeedMeFieldType extends BaseFeedMeFieldType
         return $content;
     }
 
-
-
-
-    // Private Methods
-    // =========================================================================
-
-    private function _getLatLngFromAddress($address)
+    public function getLatLngFromAddress($address)
     {
         $this->settings = craft()->plugins->getPlugin('SimpleMap')->getSettings();
 
@@ -90,7 +84,7 @@ class SimpleMap_MapFeedMeFieldType extends BaseFeedMeFieldType
         return $resp['results'][0]['geometry']['location'];
     }
 
-    private function _getAddressFromLatLng($lat, $lng)
+    public function getAddressFromLatLng($lat, $lng)
     {
         $this->settings = craft()->plugins->getPlugin('SimpleMap')->getSettings();
 
