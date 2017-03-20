@@ -27,7 +27,7 @@ class SmartMap_AddressFeedMeFieldType extends BaseFeedMeFieldType
 
         foreach ($data as $subfieldHandle => $subfieldData) {
             // Set value to subfield of correct address array
-            $content[$subfieldHandle] = $subfieldData['data'];
+            $content[$subfieldHandle] = Hash::get($subfieldData, 'data');
         }
 
         // Return data
