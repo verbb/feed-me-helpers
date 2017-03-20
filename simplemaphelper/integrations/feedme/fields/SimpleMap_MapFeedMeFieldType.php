@@ -1,6 +1,8 @@
 <?php
 namespace Craft;
 
+use Cake\Utility\Hash as Hash;
+
 class SimpleMap_MapFeedMeFieldType extends BaseFeedMeFieldType
 {
     // Templates
@@ -21,7 +23,7 @@ class SimpleMap_MapFeedMeFieldType extends BaseFeedMeFieldType
         // Initialize content array
         $content = array();
 
-        $data = $fieldData['data'];
+        $data = Hash::get($fieldData, 'data');
 
         foreach ($data as $subfieldHandle => $subfieldData) {
             // Set value to subfield of correct address array
