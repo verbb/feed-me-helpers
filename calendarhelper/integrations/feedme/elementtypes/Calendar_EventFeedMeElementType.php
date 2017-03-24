@@ -102,11 +102,36 @@ class Calendar_EventFeedMeElementType extends BaseFeedMeElementType
 
             switch ($handle) {
                 case 'id';
-                case 'interval';
-                case 'frequency';
-                case 'repeatsBy';
-                case 'untilType';
                     $element->$handle = $dataValue;
+                    break;
+                case 'rrule';
+                    $element->$handle = $dataValue;
+
+                    // Because Calendars doesn't provide this parsing for us, we do it ourselves
+                    $rules = $this->_parseRfcString($dataValue);
+
+                    foreach ($rules as $ruleKey => $ruleValue) {
+                        $modelHandle = strtolower($ruleKey);
+
+                        switch ($rules) {
+                            case 'bymonth':
+                                $element->byMonth = $ruleValue;
+                                break;
+                            case 'byyearday':
+                                $element->byYearDay = $ruleValue;
+                                break;
+                            case 'bymonthday':
+                                $element->byMonthDay = $ruleValue;
+                                break;
+                            case 'byday':
+                                $element->byDay = $ruleValue;
+                                break;
+                            default:
+                                $element->setAttribute($modelHandle, $ruleValue);
+                                break;
+                        }
+                    }
+
                     break;
                 case 'authorId';
                     $element->$handle = $this->_prepareAuthorForElement($dataValue);
@@ -126,7 +151,6 @@ class Calendar_EventFeedMeElementType extends BaseFeedMeElementType
                     break;
                 case 'enabled':
                 case 'allDay':
-                case 'repeats':
                     $element->$handle = (bool)$dataValue;
                     break;
                 case 'title':
@@ -231,5 +255,45 @@ class Calendar_EventFeedMeElementType extends BaseFeedMeElementType
         }
 
         return $author;
+    }
+
+    private function _parseRfcString($string)
+    {
+        $parts = array();
+
+        $string = trim($string);
+
+        foreach ( explode("\n", $string) as $line ) {
+            $line = trim($line);
+
+            if ( strpos($line,':') === false ) {
+                $property_name = 'RRULE';
+                $property_value = $line;
+            } else {
+                list($property_name,$property_value) = explode(':',$line);
+            }
+
+            $tmp = explode(';',$property_name);
+            $property_name = $tmp[0];
+            $property_params = array();
+            array_splice($tmp,0,1);
+
+            foreach ( $tmp as $pair ) {
+                list($key,$value) = explode('=',$pair);
+                $property_params[$key] = $value;
+            }
+
+            foreach ( explode(';',$property_value) as $pair ) {
+                list($key, $value) = explode('=', $pair);
+
+                if ( $key === 'UNTIL' ) {
+                    $value = new \DateTime($value);
+                }
+
+                $parts[$key] = $value;
+            }
+        }
+
+        return $parts;
     }
 }
