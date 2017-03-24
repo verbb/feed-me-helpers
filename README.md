@@ -1,5 +1,5 @@
-# FeedMe-Helpers
-A collection of helper plugins for Feed Me to support third-party ElementTypes and FieldTypes.
+# Feed Me Helpers
+A collection of helper plugins for [Feed Me](https://sgroup.com.au/plugins/feedme) to support third-party ElementTypes and FieldTypes.
 
 ### Installation
 Find the folder which represents the ElementType or FieldType you need to support, then install as a regular plugin. Just ensure you (obviously) have Feed Me installed.
