@@ -1,0 +1,161 @@
+{% if feed.elementGroup %}
+    {% set productTypeId = feed.elementGroup[elementType] %}
+    {% set productType = craft.digitalProductsHelper.getProductTypeById(productTypeId) %}
+{% endif %}
+
+{% set fields = [{
+    label: 'Title',
+    handle: 'title',
+    default: forms.textField({
+        id: 'fieldDefaults-title',
+        name: 'fieldDefaults[title]',
+        value: feed.fieldDefaults.title ?? '',
+    })
+}, {
+    label: 'Slug',
+    handle: 'slug',
+    instructions: 'If not set, the Slug will be automatically created from Title.' | t,
+}, {
+    label: 'Post Date',
+    handle: 'postDate',
+    instructions: 'Accepts Unix timestamp, or just about any English textual datetime description.' | t,
+    default: forms.dateTimeField({
+        id: 'fieldDefaults-postDate',
+        name: 'fieldDefaults[postDate]',
+        value: feed.fieldDefaults.postDate is defined ? craft.feedme.formatDateTime(feed.fieldDefaults.postDate) : '',
+    })
+}, {
+    label: 'Expiry Date',
+    handle: 'expiryDate',
+    instructions: 'Accepts Unix timestamp, or just about any English textual datetime description.' | t,
+    default: forms.dateTimeField({
+        id: 'fieldDefaults-expiryDate',
+        name: 'fieldDefaults[expiryDate]',
+        value: feed.fieldDefaults.expiryDate is defined ? craft.feedme.formatDateTime(feed.fieldDefaults.expiryDate) : '',
+    })
+}, {
+    label: 'Status',
+    handle: 'enabled',
+    instructions: 'Choose either a default status from the list or the imported field that will contain the status.' | t,
+    default: forms.selectField({
+        id: 'fieldDefaults-enabled',
+        name: 'fieldDefaults[enabled]',
+        value: feed.fieldDefaults.enabled is defined ? feed.fieldDefaults.enabled : '',
+        options: [
+            { label: 'Don\'t import', value: '' },
+            { label: 'Enabled', value: '1' },
+            { label: 'Disabled', value: '0' },
+        ],
+    })
+}, {
+    label: 'Tax Category',
+    handle: 'taxCategoryId',
+    default: forms.selectField({
+        id: 'fieldDefaults-taxCategoryId',
+        name: 'fieldDefaults[taxCategoryId]',
+        value: feed.fieldDefaults.taxCategoryId ?? '1',
+        options: craft.commerce.getTaxCategories(true),
+    })
+}, {
+    label: 'Free Shipping',
+    handle: 'freeShipping',
+    default: forms.checkboxField({
+        id: 'fieldDefaults-freeShipping',
+        name: 'fieldDefaults[freeShipping]',
+        checked: feed.fieldDefaults.freeShipping ?? '',
+    })
+}, {
+    label: 'Promotable',
+    handle: 'promotable',
+    default: forms.checkboxField({
+        id: 'fieldDefaults-promotable',
+        name: 'fieldDefaults[promotable]',
+        checked: feed.fieldDefaults.promotable ?? '',
+    })
+}, {
+    label: 'SKU',
+    handle: 'sku',
+    default: forms.textField({
+        id: 'fieldDefaults-sku',
+        name: 'fieldDefaults[sku]',
+        value: feed.fieldDefaults.sku ?? '',
+    })
+}, {
+    label: 'Price',
+    handle: 'price',
+    default: forms.textField({
+        id: 'fieldDefaults-price',
+        name: 'fieldDefaults[price]',
+        value: feed.fieldDefaults.price ?? '',
+    })
+}, {
+    label: 'Product ID' | t,
+    handle: 'id',
+    instructions: '<strong class="error">Warning: </strong>This should only be used for an existing Craft Commerce Product ID.' | t,
+}] %}
+
+
+<h2>{{ 'Product Fields' | t }}</h2>
+
+<table class="feedme-mapping data fullwidth collapsible">
+    <thead>
+        <th>{{ 'Field' | t }}</th>
+        <th>{{ 'Feed Element' | t }}</th>
+        <th>{{ 'Default Value' | t }}</th>
+    </thead>
+    <tbody>
+        {% for field in fields %}
+            {{ feedMeMacro.generateRow(_context, field) }}
+        {% endfor %}
+    </tbody>
+</table>
+
+<hr>
+
+{% for tab in craft.fields.getLayoutById(productType.fieldLayoutId).getTabs() %}
+    <hr>
+
+    <h2>{{ tab.name }} Fields</h2>
+
+    <table class="feedme-mapping data fullwidth collapsible">
+        <thead>
+            <th>{{ 'Field' | t }}</th>
+            <th>{{ 'Feed Element' | t }}</th>
+            <th>{{ 'Default Value' | t }}</th>
+        </thead>
+        <tbody>
+            {% for fieldtype in tab.getFields() %}
+                {% set field = fieldtype.getField() %}
+
+                {% set variables = { field: field, fieldtype: fieldtype, feed: feed, feedData: feedData } %}
+                {% include 'feedme/_includes/field' with variables %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% endfor %}
+
+<hr>
+
+<h2>{{ "Set a unique identifier for existing elements" | t }}</h2>
+
+<p>{{ "Select the fields you want to use to check for existing elements. When selected, Feed Me will look for existing elements that match the fields provided below and either update, or skip depending on your choice of Import Strategy." | t }}</p>
+
+{% set uniqueFields = fields %}
+
+{% for tab in craft.fields.getLayoutById(productType.fieldLayoutId).getTabs() %}
+    {% for fieldtype in tab.getFields() %}
+        {% set field = fieldtype.getField() %}
+
+        {% set uniqueFields = uniqueFields | merge([{ label: field.name, handle: field.handle }]) %}
+    {% endfor %}
+{% endfor %}
+
+<div class="feedme-uniques">
+    {% for field in uniqueFields %}
+        {{ forms.checkboxField({
+            name: 'fieldUnique[' ~ field.handle ~ ']',
+            label: field.label,
+            checked: feed.fieldUnique[field.handle] ?? '',
+        }) }}
+    {% endfor %}
+</div>
