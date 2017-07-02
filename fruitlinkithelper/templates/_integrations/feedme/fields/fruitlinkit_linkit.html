@@ -1,9 +1,22 @@
-{% set smartMapSubfields = ['type', 'custom', 'customText'] %}
+{% set subfields = [
+    {
+        title: "Type" | t,
+        handle: 'type',
+    },
+    {
+        title: "Custom URL" | t,
+        handle: 'custom',
+    },
+    {
+        title: "Custom Text" | t,
+        handle: 'customText',
+    },
+] %}
 
-{% for subfield in smartMapSubfields %}
-    {% set optionLabel  = field.name ~ ' (' ~ subfield ~ ')' %}
-    {% set optionLabelHandle = field.handle ~ '[' ~ subfield ~ ']' %}
-    {% set optionHandle = field.handle ~ '--' ~ subfield %}
+{% for subfield in subfields %}
+    {% set optionLabel  = field.name ~ ' (' ~ subfield.title ~ ')' %}
+    {% set optionLabelHandle = field.handle ~ '[' ~ subfield.handle ~ ']' %}
+    {% set optionHandle = field.handle ~ '--' ~ subfield.handle %}
 
     <tr>
         <td class="col-field">
@@ -20,23 +33,55 @@
 
         <td class="col-map">
             {% namespace 'fieldMapping' %}
-            {{ forms.selectField({
-                id: optionHandle,
-                name: optionHandle,
-                value: feed.fieldMapping[optionHandle] ?? '',
-                options: feedData,
-            }) }}
+                {{ forms.selectField({
+                    id: optionHandle,
+                    name: optionHandle,
+                    value: feed.fieldMapping[optionHandle] ?? '',
+                    options: feedData,
+                }) }}
             {% endnamespace %}
         </td>
 
         <td class="col-default">
             <div class="default-fields">
                 {% namespace 'fieldDefaults' %}
-                {{ forms.textField({
-                    id: optionHandle,
-                    name: optionHandle,
-                    value: feed.fieldDefaults[optionHandle] ?? '',
-                }) }}
+
+                    {% if subfield.handle == 'type' %}
+                        {{ forms.selectField({
+                            id: optionHandle,
+                            name: optionHandle,
+                            value: feed.fieldDefaults[optionHandle] ?? '',
+                            options: [{
+                                value: 'email',
+                                label: 'Email Address' | t,
+                            }, {
+                                value: 'tel',
+                                label: 'Phone Number' | t,
+                            }, {
+                                value: 'custom',
+                                label: 'Custom URL' | t,
+                            }, {
+                                value: 'entry',
+                                label: 'Entry' | t,
+                            }, {
+                                value: 'category',
+                                label: 'Category' | t,
+                            }, {
+                                value: 'asset',
+                                label: 'Asset' | t,
+                            }, {
+                                value: 'product',
+                                label: 'Product' | t,
+                            }]
+                        }) }}
+                    {% else %}
+                        {{ forms.textField({
+                            id: optionHandle,
+                            name: optionHandle,
+                            value: feed.fieldDefaults[optionHandle] ?? '',
+                        }) }}
+                    {% endif %}
+
                 {% endnamespace %}
             </div>
         </td>
