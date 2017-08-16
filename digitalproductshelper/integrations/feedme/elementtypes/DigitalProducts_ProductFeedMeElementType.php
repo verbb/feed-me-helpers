@@ -73,7 +73,13 @@ class DigitalProducts_ProductFeedMeElementType extends BaseFeedMeElementType
         }
 
         // Check to see if an element already exists - interestingly, find()[0] is faster than first()
-        return $criteria->find();
+        $elements = $criteria->find();
+
+        if (count($elements)) {
+            return $elements[0];
+        }
+
+        return null;
     }
 
     public function delete(array $elements)
@@ -123,7 +129,7 @@ class DigitalProducts_ProductFeedMeElementType extends BaseFeedMeElementType
                 case 'enabled':
                 case 'freeShipping':
                 case 'promotable':
-                    $element->$handle = (bool)$dataValue;
+                    $element->$handle = FeedMeHelper::parseBoolean($dataValue);
                     break;
                 case 'title':
                     $element->getContent()->$handle = $dataValue;

@@ -157,7 +157,7 @@ class Calendar_EventFeedMeElementType extends BaseFeedMeElementType
                     break;
                 case 'enabled':
                 case 'allDay':
-                    $element->$handle = (bool)$dataValue;
+                    $element->$handle = FeedMeHelper::parseBoolean($dataValue);
                     break;
                 case 'title':
                     $element->getContent()->$handle = $dataValue;
