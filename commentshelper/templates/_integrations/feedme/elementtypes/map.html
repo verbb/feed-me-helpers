@@ -1,0 +1,122 @@
+{% set users = [{ label: 'Don\'t import', value: '' }] %}
+{% if CraftEdition == CraftClient %}
+    {% for user in craft.feedMe.getClientUsers() %}
+        {% set users = users | merge([{ label: user, value: user.id }]) %}
+    {% endfor %}
+{% endif %}
+
+{% if CraftEdition == CraftPro %}
+    {% for user in craft.users %}
+        {% set users = users | merge([{ label: user, value: user.id }]) %}
+    {% endfor %}
+{% endif %}
+
+{% set fields = [{
+    label: 'Comment' | t,
+    handle: 'comment',
+    instructions: 'The contents of the comment.' | t,
+    required: true,
+}, {
+    label: 'Element Type' | t,
+    handle: 'elementType',
+    instructions: 'The element type this comment was made on.' | t,
+    required: true,
+    default: forms.selectField({
+        id: 'fieldDefaults-elementType',
+        name: 'fieldDefaults[elementType]',
+        value: feed.fieldDefaults.elementType ?? '',
+        options: [
+            { label: 'Don\'t import', value: '' },
+            { label: 'Entry', value: 'entry' },
+            { label: 'Category', value: 'category' },
+            { label: 'Asset', value: 'asset' },
+            { label: 'User', value: 'user' },
+        ],
+    }),
+}, {
+    label: 'Element' | t,
+    handle: 'elementId',
+    instructions: 'The element this comment was made on.' | t,
+    required: true,
+}, {
+    label: 'Name' | t,
+    handle: 'name',
+    instructions: 'The name of the commenter.' | t,
+}, {
+    label: 'Email' | t,
+    handle: 'email',
+    instructions: 'The email of the commenter.' | t,
+}, {
+    label: 'IP Address' | t,
+    handle: 'ipAddress',
+}, {
+    label: 'User Agent' | t,
+    handle: 'userAgent',
+}, {
+    label: 'Status' | t,
+    handle: 'status',
+    instructions: 'Choose the status for this comment.' | t,
+    default: forms.selectField({
+        id: 'fieldDefaults-status',
+        name: 'fieldDefaults[status]',
+        value: feed.fieldDefaults.status is defined ? feed.fieldDefaults.status : '',
+        options: [
+            { label: 'Don\'t import', value: '' },
+            { label: 'Approved', value: 'approved' },
+            { label: 'Pending', value: 'pending' },
+            { label: 'Spam', value: 'spam' },
+            { label: 'Trashed', value: 'trashed' },
+        ],
+    }),
+}, {
+    label: 'Author' | t,
+    handle: 'userId',
+    instructions: 'Comments will be assigned to the user in this field. If the field does not match any existing member, the default author will be assigned.' | t,
+    default: forms.selectField({
+        id: 'fieldDefaults-userId',
+        name: 'fieldDefaults[userId]',
+        value: feed.fieldDefaults.userId ?? '',
+        options: users,
+    }),
+}, {
+    label: 'Comment ID' | t,
+    handle: 'id',
+    instructions: '<strong class="error">Warning: </strong>This should only be used for an existing Comment ID.' | t,
+}] %}
+
+<h2>{{ 'Comment Fields' | t }}</h2>
+
+{{ forms.hidden({ name: 'fieldDefaults[structureId]', value: craft.comments.settings().structureId }) }}
+
+<table class="feedme-mapping data fullwidth collapsible">
+    <thead>
+        <th>{{ 'Field' | t }}</th>
+        <th>{{ 'Feed Element' | t }}</th>
+        <th>{{ 'Default Value' | t }}</th>
+    </thead>
+    <tbody>
+        {% for field in fields if field %}
+            {% if field.handle == 'elementId' %}
+                {{ feedMeMacro.generateElementRow(_context, field) }}
+            {% else %}
+                {{ feedMeMacro.generateRow(_context, field) }}
+            {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
+
+<hr>
+
+<h2>{{ "Set a unique identifier for existing elements" | t }}</h2>
+
+<p>{{ "Select the fields you want to use to check for existing elements. When selected, Feed Me will look for existing elements that match the fields provided below and either update, or skip depending on your choice of Import Strategy." | t }}</p>
+
+<div class="feedme-uniques">
+    {% for field in fields if field %}
+        {{ forms.checkboxField({
+            name: 'fieldUnique[' ~ field.handle ~ ']',
+            label: field.label,
+            checked: feed.fieldUnique[field.handle] ?? '',
+        }) }}
+    {% endfor %}
+</div>
