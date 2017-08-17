@@ -144,37 +144,7 @@ class Comments_CommentFeedMeElementType extends BaseFeedMeElementType
         // Put this back for now, until we can figure out a better solution with required fields
         $element->setContentFromPost($data);
 
-        // Are we targeting a specific locale here? If so, we create an essentially blank element
-        // for the primary locale, and instead create a locale for the targeted locale
-        if (isset($settings['locale']) && $settings['locale']) {
-            // Save the default locale element empty
-            if (craft()->comments->saveComment($element)) {
-                // Now get the successfully saved (empty) element, and set content on that instead
-                $elementLocale = craft()->comments->getCommentById($element->id, $settings['locale']);
-                $elementLocale->setContentFromPost($data);
-
-                // Save the locale entry
-                if (craft()->comments->saveComment($elementLocale)) {
-                    return true;
-                } else {
-                    if ($elementLocale->getErrors()) {
-                        throw new Exception(json_encode($elementLocale->getErrors()));
-                    } else {
-                        throw new Exception(Craft::t('Unknown Element error occurred.'));
-                    }
-                }
-            } else {
-                if ($element->getErrors()) {
-                    throw new Exception(json_encode($element->getErrors()));
-                } else {
-                    throw new Exception(Craft::t('Unknown Element error occurred.'));
-                }
-            }
-
-            return false;
-        } else {
-            return craft()->comments->saveComment($element);
-        }
+        return craft()->comments->saveComment($element, false);
     }
 
     public function afterSave(BaseElementModel $element, array $data, $settings)

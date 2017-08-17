@@ -42,16 +42,36 @@
     label: 'Name' | t,
     handle: 'name',
     instructions: 'The name of the commenter.' | t,
+    default: forms.textField({
+        id: 'fieldDefaults-name',
+        name: 'fieldDefaults[name]',
+        value: feed.fieldDefaults.name ?? '',
+    }),
 }, {
     label: 'Email' | t,
     handle: 'email',
     instructions: 'The email of the commenter.' | t,
+    default: forms.textField({
+        id: 'fieldDefaults-email',
+        name: 'fieldDefaults[email]',
+        value: feed.fieldDefaults.email ?? '',
+    }),
 }, {
     label: 'IP Address' | t,
     handle: 'ipAddress',
+    default: forms.textField({
+        id: 'fieldDefaults-ipAddress',
+        name: 'fieldDefaults[ipAddress]',
+        value: feed.fieldDefaults.ipAddress ?? '',
+    }),
 }, {
     label: 'User Agent' | t,
     handle: 'userAgent',
+    default: forms.textField({
+        id: 'fieldDefaults-userAgent',
+        name: 'fieldDefaults[userAgent]',
+        value: feed.fieldDefaults.userAgent ?? '',
+    }),
 }, {
     label: 'Status' | t,
     handle: 'status',
