@@ -35,6 +35,7 @@ class Comments_CommentFeedMeElementType extends BaseFeedMeElementType
     public function setModel($settings)
     {
         $element = new Comments_CommentModel();
+        $element->structureId = craft()->comments->getStructureId();
 
         if ($settings['locale']) {
             $element->locale = $settings['locale'];
@@ -102,7 +103,6 @@ class Comments_CommentFeedMeElementType extends BaseFeedMeElementType
             }
 
             switch ($handle) {
-                case 'structureId':
                 case 'elementType':
                 case 'status':
                 case 'name':
