@@ -1,0 +1,46 @@
+{% macro generateRow(subfieldLabel, subfieldHandle, field, feedData, feed) %}
+    {% import "_includes/forms" as forms %}
+
+    {% set optionLabel  = field.name ~ ' (' ~ subfieldLabel ~ ')' %}
+    {% set optionLabelHandle = field.handle ~ '[' ~ subfieldHandle ~ ']' %}
+    {% set optionHandle = field.handle ~ '--' ~ subfieldHandle %}
+
+    <tr>
+        <td class="col-field">
+            <div class="field">
+                <div class="heading">
+                    <label>{{ optionLabel }}</label>
+
+                    <div class="instructions">
+                        <code>{{ optionLabelHandle }}</code>
+                    </div>
+                </div>
+            </div>
+        </td>
+
+        <td class="col-map">
+            {% namespace 'fieldMapping' %}
+                {{ forms.selectField({
+                    id: optionHandle,
+                    name: optionHandle,
+                    value: feed.fieldMapping[optionHandle] ?? '',
+                    options: feedData,
+                }) }}
+            {% endnamespace %}
+        </td>
+
+        <td class="col-default">
+            <div class="default-fields">
+                
+            </div>
+        </td>
+    </tr>
+{% endmacro %}
+
+{{ _self.generateRow('Name', 'name', field, feedData, feed) }}
+{{ _self.generateRow('Street Address', 'street', field, feedData, feed) }}
+{{ _self.generateRow('Street Address 2', 'street2', field, feedData, feed) }}
+{{ _self.generateRow('City', 'city', field, feedData, feed) }}
+{{ _self.generateRow('State/Province', 'region', field, feedData, feed) }}
+{{ _self.generateRow('Postal Code', 'postalCode', field, feedData, feed) }}
+{{ _self.generateRow('Country', 'country', field, feedData, feed) }}
