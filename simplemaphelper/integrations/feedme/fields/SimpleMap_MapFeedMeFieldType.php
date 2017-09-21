@@ -25,9 +25,25 @@ class SimpleMap_MapFeedMeFieldType extends BaseFeedMeFieldType
 
         $data = Hash::get($fieldData, 'data');
 
-        foreach ($data as $subfieldHandle => $subfieldData) {
-            // Set value to subfield of correct address array
-            $content[$subfieldHandle] = Hash::get($subfieldData, 'data');
+        // Normalise array indexes due to multitude of different ways we can be supplied data
+        $attributes = array(
+            'lat',
+            'lng',
+            'zoom',
+            'address'
+        );
+
+        foreach (Hash::flatten($data) as $key => $value) {
+            foreach ($attributes as $attribute) {
+                if (strstr($key, $attribute)) {
+                    $newKey = $attribute;
+                    break;
+                }
+            }
+
+            if ($newKey) {
+                $content[$newKey] = $value;
+            }
         }
 
         // In order to full-fill any empty gaps in data (lng/lat/address), we check to see if we have any data missing
