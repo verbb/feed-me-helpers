@@ -114,7 +114,12 @@ class Comments_CommentFeedMeElementType extends BaseFeedMeElementType
                     $element->$handle = $dataValue;
                     break;
                 case 'elementId';
-                    $element->$handle = $this->_prepareOwnerForElement($value, $data);
+                    $owner = $this->_prepareOwnerForElement($value, $data);
+
+                    if ($owner) {
+                        $element->$handle = $owner;
+                    }
+
                     break;
                 case 'userId';
                     $element->$handle = $this->_prepareAuthorForElement($dataValue);
@@ -176,7 +181,7 @@ class Comments_CommentFeedMeElementType extends BaseFeedMeElementType
 
     private function _prepareOwnerForElement($value, $data)
     {
-        $elementType = Hash::get($data, 'elementType.data');
+        $elementType = Hash::get($data, 'elementType');
         $dataValue = Hash::get($value, 'data');
         $matchAttribute = Hash::get($value, 'options.match');
 
@@ -195,8 +200,6 @@ class Comments_CommentFeedMeElementType extends BaseFeedMeElementType
         if (count($elements)) {
             return $elements[0]->id;
         }
-
-        return $dataValue;
     }
 
 }
