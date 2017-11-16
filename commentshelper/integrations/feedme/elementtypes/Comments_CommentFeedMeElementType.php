@@ -186,7 +186,7 @@ class Comments_CommentFeedMeElementType extends BaseFeedMeElementType
         $matchAttribute = Hash::get($value, 'options.match');
 
         if (!$elementType || !$dataValue || !$matchAttribute) {
-            return $dataValue;
+            return null;
         }
 
         if (is_numeric($dataValue)) {
@@ -194,7 +194,11 @@ class Comments_CommentFeedMeElementType extends BaseFeedMeElementType
         }
 
         $criteria = craft()->elements->getCriteria($elementType);
+        $criteria->status = null;
+        $criteria->limit = null;
+        $criteria->localeEnabled = null;
         $criteria->$matchAttribute = $dataValue;
+
         $elements = $criteria->find();
 
         if (count($elements)) {
